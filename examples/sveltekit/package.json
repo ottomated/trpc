@@ -1,22 +1,28 @@
 {
-	"name": "@examples/sveltekit",
-	"version": "10.9.0",
-	"private": true,
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^1.0.0",
-		"@sveltejs/kit": "^1.0.0",
-		"svelte": "^3.54.0",
-		"svelte-check": "^2.9.2",
-		"tslib": "^2.4.1",
-		"typescript": "^4.9.3",
-		"vite": "^4.0.0"
-	},
-	"type": "module"
+  "name": "@examples/sveltekit",
+  "version": "10.9.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^1.0.0",
+    "@sveltejs/kit": "^1.0.0",
+    "svelte": "^3.54.0",
+    "svelte-check": "^2.9.2",
+    "tslib": "^2.4.1",
+    "typescript": "^4.9.3",
+    "vite": "^4.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@tanstack/svelte-query": "^4.3.8",
+    "@trpc/server": "workspace:^10.9.0",
+    "@trpc/svelte-query": "workspace:^10.9.0",
+    "zod": "^3.0.0"
+  }
 }
