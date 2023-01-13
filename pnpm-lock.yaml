@@ -850,11 +850,20 @@ importers:
     specifiers:
       '@sveltejs/adapter-auto': ^1.0.0
       '@sveltejs/kit': ^1.0.0
+      '@tanstack/svelte-query': ^4.3.8
+      '@trpc/server': workspace:^10.9.0
+      '@trpc/svelte-query': workspace:^10.9.0
       svelte: ^3.54.0
       svelte-check: ^2.9.2
       tslib: ^2.4.1
       typescript: ^4.9.3
       vite: ^4.0.0
+      zod: ^3.0.0
+    dependencies:
+      '@tanstack/svelte-query': 4.22.2_svelte@3.55.1
+      '@trpc/server': link:../../packages/server
+      '@trpc/svelte-query': link:../../packages/svelte-query
+      zod: 3.20.2
     devDependencies:
       '@sveltejs/adapter-auto': 1.0.0_@sveltejs+kit@1.0.11
       '@sveltejs/kit': 1.0.11_svelte@3.55.1+vite@4.0.4
@@ -1044,6 +1053,24 @@ importers:
       typescript: 4.8.3
       ws: 8.11.0
       yup: 0.32.11
+      zod: 3.20.2
+
+  packages/svelte-query:
+    specifiers:
+      '@tanstack/svelte-query': ^4.3.8
+      '@trpc/client': ^10.9.0
+      '@trpc/server': ^10.9.0
+      eslint: ^8.30.0
+      rollup: ^2.79.1
+      tsx: ^3.9.0
+      zod: ^3.0.0
+    devDependencies:
+      '@tanstack/svelte-query': 4.22.2
+      '@trpc/client': link:../client
+      '@trpc/server': link:../server
+      eslint: 8.30.0
+      rollup: 2.79.1
+      tsx: 3.12.1
       zod: 3.20.2
 
   packages/tests:
@@ -6908,6 +6935,9 @@ packages:
       remove-accents: 0.4.2
     dev: true
 
+  /@tanstack/query-core/4.22.0:
+    resolution: {integrity: sha512-OeLyBKBQoT265f5G9biReijeP8mBxNFwY7ZUu1dKL+YzqpG5q5z7J/N1eT8aWyKuhyDTiUHuKm5l+oIVzbtrjw==}
+
   /@tanstack/query-core/4.6.0:
     resolution: {integrity: sha512-8b+vwooh8b4z1bIT3Ca7OVSyARM5JNbXi6F+g5VLYiflRd0AtJ+koqhin7UGhR11bbypmzVRKllWHwexWjKjDg==}
 
@@ -6942,6 +6972,23 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       use-sync-external-store: 1.2.0_react@18.2.0
+
+  /@tanstack/svelte-query/4.22.2:
+    resolution: {integrity: sha512-e7PIMuRS3viilkMXrDOxYYnU7LbeqpyK6J+cQTtDjA9tFvAFzYt/9DSy5uhjKkNPh0jGFSmY2GBRa2UtSlGQJg==}
+    peerDependencies:
+      svelte: ^3.54.0
+    dependencies:
+      '@tanstack/query-core': 4.22.0
+    dev: true
+
+  /@tanstack/svelte-query/4.22.2_svelte@3.55.1:
+    resolution: {integrity: sha512-e7PIMuRS3viilkMXrDOxYYnU7LbeqpyK6J+cQTtDjA9tFvAFzYt/9DSy5uhjKkNPh0jGFSmY2GBRa2UtSlGQJg==}
+    peerDependencies:
+      svelte: ^3.54.0
+    dependencies:
+      '@tanstack/query-core': 4.22.0
+      svelte: 3.55.1
+    dev: false
 
   /@testing-library/dom/8.19.0:
     resolution: {integrity: sha512-6YWYPPpxG3e/xOo6HIWwB/58HukkwIVTOaZ0VwdMVjhRUX/01E4FtQbck9GazOOj7MXHc5RBzMrU86iBJHbI+A==}
@@ -20191,7 +20238,6 @@ packages:
   /svelte/3.55.1:
     resolution: {integrity: sha512-S+87/P0Ve67HxKkEV23iCdAh/SX1xiSfjF1HOglno/YTbSTW7RniICMCofWGdJJbdjw3S+0PfFb1JtGfTXE0oQ==}
     engines: {node: '>= 8'}
-    dev: true
 
   /svg-parser/2.0.4:
     resolution: {integrity: sha512-e4hG1hRwoOdRb37cIMSgzNsxyzKfayW6VOflrwvR+/bzrkyxY/31WkbgnQpgtrNp1SdpJvpUAGTa/ZoiPNDuRQ==}

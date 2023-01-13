@@ -14,6 +14,8 @@
       "@trpc/react-query/*": ["packages/react-query/src/*"],
       "@trpc/next": ["packages/next/src"],
       "@trpc/next/*": ["packages/next/src/*"],
+      "@trpc/svelte-query": ["packages/svelte-query/src"],
+      "@trpc/svelte-query/*": ["packages/svelte-query/src/*"],
       "$test/*": ["test/*"]
     }
   }

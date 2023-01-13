@@ -1,0 +1,73 @@
+{
+  "name": "@trpc/svelte-query",
+  "version": "10.9.0",
+  "description": "tRPC Svelte lib",
+  "author": "Ottomated",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
+  "homepage": "https://trpc.io",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/trpc/trpc.git",
+    "directory": "packages/svelte-query"
+  },
+  "scripts": {
+    "build": "rollup --config rollup.config.ts --configPlugin rollup-plugin-swc3",
+    "dev": "pnpm build --watch",
+    "codegen:entrypoints": "tsx entrypoints.script.ts",
+    "lint": "eslint --ext \".js,.ts,.tsx\" --ignore-path ../../.gitignore --report-unused-disable-directives src",
+    "ts-watch": "tsc --project tsconfig.watch.json"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./ssr": {
+      "import": "./dist/ssr/index.mjs",
+      "require": "./dist/ssr/index.js",
+      "default": "./dist/ssr/index.js"
+    },
+    "./shared": {
+      "import": "./dist/shared/index.mjs",
+      "require": "./dist/shared/index.js",
+      "default": "./dist/shared/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "ssr",
+    "shared"
+  ],
+  "eslintConfig": {
+    "rules": {
+      "no-restricted-imports": [
+        "error",
+        "@trpc/svelte-query"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@tanstack/svelte-query": "^4.3.8",
+    "@trpc/client": "^10.8.0",
+    "@trpc/server": "^10.8.0",
+    "svelte": "^3.55.1"
+  },
+  "devDependencies": {
+    "@tanstack/svelte-query": "^4.3.8",
+    "@trpc/client": "^10.9.0",
+    "@trpc/server": "^10.9.0",
+    "eslint": "^8.30.0",
+    "rollup": "^2.79.1",
+    "tsx": "^3.9.0",
+    "zod": "^3.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

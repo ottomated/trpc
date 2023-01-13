@@ -21,3 +21,6 @@
 
 '@trpc/react-query':
   - any: ['packages/react-query/**', '!packages/react-query/package.json']
+
+'@trpc/svelte-query':
+  - any: ['packages/svelte-query/**', '!packages/svelte-query/package.json']
