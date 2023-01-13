@@ -22,9 +22,9 @@ import {
   AnyProcedure,
   AnyQueryProcedure,
   AnyRouter,
-  ProcedureArgs,
   ProcedureRouterRecord,
   ProtectedIntersection,
+  inferProcedureInput,
 } from '@trpc/server';
 import {
   createRecursiveProxy,
@@ -33,10 +33,6 @@ import {
 import { getArrayQueryKey } from './internals/getArrayQueryKey';
 import { CreateSvelteUtilsProxy, createUtilsProxy } from './shared';
 import { splitUserOptions } from './utils/splitUserOptions';
-
-type inferProcedureInput<TProcedure extends AnyProcedure> = ProcedureArgs<
-  TProcedure['_def']
->[0];
 
 /**
  * @internal
