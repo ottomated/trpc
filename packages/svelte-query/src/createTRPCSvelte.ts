@@ -55,7 +55,7 @@ export type UserExposedOptions<TOptions> = TodoTypeName<TOptions> &
 type DecorateProcedure<TProcedure extends AnyProcedure> =
   TProcedure extends AnyQueryProcedure
     ? {
-        createQuery: (
+        query: (
           input: inferProcedureInput<TProcedure>,
           options?: UserExposedOptions<
             CreateQueryOptions<
@@ -63,10 +63,13 @@ type DecorateProcedure<TProcedure extends AnyProcedure> =
               TRPCClientErrorLike<TProcedure>
             >
           >,
-        ) => CreateQueryResult<inferTransformedProcedureOutput<TProcedure>>;
+        ) => CreateQueryResult<
+          inferTransformedProcedureOutput<TProcedure>,
+          TRPCClientErrorLike<TProcedure>
+        >;
       } & (inferProcedureInput<TProcedure> extends { cursor?: any }
         ? {
-            createInfiniteQuery: (
+            infiniteQuery: (
               input: Omit<inferProcedureInput<TProcedure>, 'cursor'>,
               options?: UserExposedOptions<
                 CreateInfiniteQueryOptions<
@@ -82,7 +85,7 @@ type DecorateProcedure<TProcedure extends AnyProcedure> =
         : object)
     : TProcedure extends AnyMutationProcedure
     ? {
-        createMutation: <TContext = unknown>(
+        mutation: <TContext = unknown>(
           opts?: UserExposedOptions<
             CreateMutationOptions<
               inferTransformedProcedureOutput<TProcedure>,
@@ -121,9 +124,9 @@ export type CreateTRPCSvelte<TRouter extends AnyRouter> = ProtectedIntersection<
 >;
 
 const clientMethods = {
-  createQuery: [1, 'query'],
-  createMutation: [0, 'any'],
-  createInfiniteQuery: [1, 'infinite'],
+  query: [1, 'query'],
+  mutation: [0, 'any'],
+  infiniteQuery: [1, 'infinite'],
 } as const;
 
 type ClientMethod = keyof typeof clientMethods;
@@ -151,7 +154,7 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
     // Create the query key - input is undefined for mutations
     const key = getArrayQueryKey(
       path,
-      method === 'createMutation' ? undefined : args[0],
+      method === 'mutation' ? undefined : args[0],
       queryType,
     );
 
@@ -159,14 +162,14 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
     const enabled = tanstackQueryOptions?.enabled !== false && browser;
 
     switch (method) {
-      case 'createQuery':
+      case 'query':
         return createQuery({
           ...tanstackQueryOptions,
           enabled,
           queryKey: key,
           queryFn: () => client.query(joinedPath, args[0], trpcOptions),
         });
-      case 'createMutation': {
+      case 'mutation': {
         return createMutation({
           ...tanstackQueryOptions,
           mutationKey: key,
@@ -174,7 +177,7 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
             client.mutation(joinedPath, variables, trpcOptions),
         });
       }
-      case 'createInfiniteQuery':
+      case 'infiniteQuery':
         return createInfiniteQuery({
           ...tanstackQueryOptions,
           enabled,

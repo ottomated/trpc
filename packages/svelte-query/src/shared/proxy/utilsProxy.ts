@@ -26,9 +26,9 @@ import {
   createRecursiveProxy,
   inferTransformedProcedureOutput,
 } from '@trpc/server/shared';
-import { splitUserOptions } from '../../utils/splitUserOptions';
 import { UserExposedOptions } from '../../createTRPCSvelte';
 import { QueryType, getArrayQueryKey } from '../../internals/getArrayQueryKey';
+import { splitUserOptions } from '../../utils/splitUserOptions';
 
 type DecorateProcedure<TProcedure extends AnyQueryProcedure> = {
   invalidate: <TPageData = unknown>(
