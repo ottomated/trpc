@@ -1,9 +1,11 @@
 <script lang="ts">
+  import { browser } from '$app/environment';
 	import { trpc } from '$lib/trpc/client';
 
-	const utils = trpc.getContext();
+	const utils = trpc.context;
 
 	const names = trpc.names.list.query();
+	
 
 	let newName = '';
 
@@ -19,8 +21,10 @@
 
 <h1>Names</h1>
 
+
 {#if $names.isSuccess}
 	{#each $names.data as name}
+	<a href="/names/{name.id}">{name.name}</a>
 		<p data-id={name.id}>
 			<input value={name.name} on:blur={(ev) => {
 				$updateName.mutate({
@@ -48,3 +52,7 @@
 }}>
 	Add Name
 </button>
+
+<h2>State</h2>
+
+<pre>{JSON.stringify($names, null, 2)}</pre>

@@ -1061,9 +1061,12 @@ importers:
       '@trpc/client': ^10.9.0
       '@trpc/server': ^10.9.0
       eslint: ^8.30.0
+      esm-env: ^1.0.0
       rollup: ^2.79.1
       tsx: ^3.9.0
       zod: ^3.0.0
+    dependencies:
+      esm-env: 1.0.0
     devDependencies:
       '@tanstack/svelte-query': 4.22.2
       '@trpc/client': link:../client
@@ -11646,7 +11649,6 @@ packages:
 
   /esm-env/1.0.0:
     resolution: {integrity: sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==}
-    dev: true
 
   /esniff/1.1.0:
     resolution: {integrity: sha512-vmHXOeOt7FJLsqofvFk4WB3ejvcHizCd8toXXwADmYfd02p2QwHRgkUbhYDX54y08nqk818CUTWipgZGlyN07g==}

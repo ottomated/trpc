@@ -69,5 +69,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "esm-env": "^1.0.0"
   }
 }

@@ -3,7 +3,12 @@
 // and what to do when importing types
 declare namespace App {
   // interface Error {}
-  // interface Locals {}
+  interface Locals {
+    trpc: {
+      prefetch: (query: string, input?: unknown) => Promise<void>;
+      map: Map<string, unknown>;
+    };
+  }
   // interface PageData {}
   // interface Platform {}
 }

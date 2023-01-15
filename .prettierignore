@@ -8,3 +8,4 @@ examples/next-big-router/src/server/routers/*.ts
 packages/server/test/__packages.ts
 packages/tests/server/___packages.ts
 pnpm-lock.yaml
+examples/sveltekit/.svelte-kit/

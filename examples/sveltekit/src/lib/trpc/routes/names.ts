@@ -5,7 +5,9 @@ import { procedure, router } from '../server';
 const db = new Map<string, string>();
 
 export const nameRouter = router({
-  list: procedure.query(() => {
+  list: procedure.query(async () => {
+    console.log('called list');
+    await new Promise((r) => setTimeout(r, 1000));
     return [...db.entries()].map(([id, name]) => ({ id, name }));
   }),
   get: procedure
@@ -14,7 +16,8 @@ export const nameRouter = router({
         id: z.string(),
       }),
     )
-    .query(({ input }) => {
+    .query(async ({ input }) => {
+			await new Promise((r) => setTimeout(r, 1000));
       return db.get(input.id);
     }),
   add: procedure
