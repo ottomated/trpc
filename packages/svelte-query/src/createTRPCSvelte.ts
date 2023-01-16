@@ -6,11 +6,11 @@ import {
   CreateQueryOptions,
   CreateQueryResult,
   QueryClient,
+  QueryClientConfig,
   QueryKey,
   createInfiniteQuery,
   createMutation,
   createQuery,
-	QueryClientConfig,
 } from '@tanstack/svelte-query';
 import {
   CreateTRPCClientOptions,
@@ -37,11 +37,11 @@ import { BROWSER } from 'esm-env';
 import { getArrayQueryKey } from './internals/getArrayQueryKey';
 import { CreateSvelteUtilsProxy, createUtilsProxy } from './shared';
 import {
-  SveltekitRequestEvent,
   SveltekitRequestEventInput,
   TRPCSSRData,
   getSSRData,
   localsSymbol,
+  parseSSRArgs,
 } from './ssr';
 import { splitUserOptions } from './utils/splitUserOptions';
 
@@ -102,11 +102,11 @@ type DecorateProcedure<TProcedure extends AnyProcedure> =
                 inferTransformedProcedureOutput<TProcedure>,
                 TRPCClientErrorLike<TProcedure>
               >;
-							ssrInfinite: (
-								input: inferProcedureInput<TProcedure>,
-								event: SveltekitRequestEventInput,
-								options?: TRPCRequestOptions,
-							) => Promise<void>;
+              ssrInfinite: (
+                input: inferProcedureInput<TProcedure>,
+                event: SveltekitRequestEventInput,
+                options?: TRPCRequestOptions,
+              ) => Promise<void>;
             }
           : object)
     : TProcedure extends AnyMutationProcedure
@@ -144,7 +144,7 @@ export type CreateTRPCSvelteBase<TRouter extends AnyRouter> = {
   context: CreateSvelteUtilsProxy<TRouter>;
   queryClient: QueryClient;
   ssr: typeof getSSRData;
-  loadSSRData: (data: TRPCSSRData) => void;
+  hydrateQueryClient: (data: TRPCSSRData) => QueryClient;
 };
 
 export type CreateTRPCSvelte<TRouter extends AnyRouter> = ProtectedIntersection<
@@ -156,36 +156,48 @@ const clientMethods = {
   query: [1, 'query'],
   mutation: [0, 'any'],
   infiniteQuery: [1, 'infinite'],
-	ssr: [1, 'query'],
-	ssrInfinite: [-1, 'infinite']
+  ssr: [-1, 'query'],
+  ssrInfinite: [-1, 'infinite'],
 } as const;
 
 type ClientMethod = keyof typeof clientMethods;
 
 function createSvelteInternalProxy<TRouter extends AnyRouter>(
-	client: TRPCUntypedClient<TRouter>,
-	opts: CreateTRPCSvelteOptions<TRouter>,
+  client: TRPCUntypedClient<TRouter>,
+  opts: CreateTRPCSvelteOptions<TRouter>,
 ) {
-  const queryClient = new QueryClient(opts.queryClientConfig);
+  let queryClient: QueryClient;
+  if (BROWSER) {
+    queryClient = new QueryClient(opts.queryClientConfig);
+  }
 
-	return createFlatProxy<CreateTRPCSvelte<TRouter>>((firstPath) => {
-		console.log(JSON.stringify(queryClient.getQueriesData()));
+  return createFlatProxy<CreateTRPCSvelte<TRouter>>((firstPath) => {
     switch (firstPath) {
       case 'context':
         return createUtilsProxy(client, queryClient);
-      case 'queryClient':
-        return queryClient;
+      case 'queryClient': {
+        if (BROWSER) {
+          return queryClient;
+        } else {
+          throw new Error('`trpc.queryClient` is only available on the client');
+        }
+      }
       case 'ssr':
         if (BROWSER) {
           throw new Error('`trpc.ssr` is only available on the server');
         } else {
           return getSSRData;
         }
-      case 'loadSSRData': {
+      case 'hydrateQueryClient': {
         return (data: TRPCSSRData) => {
-					for (const [key, value] of data.entries()) {
-            queryClient.setQueryData(key, value);
+          let client = queryClient;
+          if (!BROWSER) {
+            client = new QueryClient(opts.queryClientConfig);
           }
+          for (const [key, value] of data.entries()) {
+            client.setQueryData(key, value);
+          }
+          return client;
         };
       }
     }
@@ -247,33 +259,16 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
               return client.query(joinedPath, input, trpcOptions);
             },
           });
-				case 'ssr':
-				case 'ssrInfinite':
+        case 'ssr':
+        case 'ssrInfinite':
           if (BROWSER) {
             throw new TypeError(
               `\`trpc.${path}.ssr\` is only available on the server`,
             );
           } else {
-            let event: SveltekitRequestEvent;
-            let options: TRPCRequestOptions | undefined;
-            let input: unknown;
-            if (args.length === 1) {
-              event = args[0];
-            } else if (args.length === 2) {
-              if ('locals' in args[0] && localsSymbol in args[0].locals) {
-                event = args[0];
-                options = args[1];
-              } else {
-                input = args[0];
-                event = args[1];
-              }
-            } else if (args.length === 3) {
-              input = args[0];
-              event = args[1];
-              options = args[2];
-            } else {
-              throw new Error('Invalid arguments');
-            }
+            const [input, event, options] = parseSSRArgs(args);
+            if (event.isDataRequest) return;
+
             const key = getArrayQueryKey(path, input, queryType);
 
             return client
@@ -284,13 +279,12 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
                   fetch: event.fetch,
                 },
               })
-							.then((data) => {
-
-								if (!event.locals[localsSymbol]) {
-									event.locals[localsSymbol] = new Map();
-								}
-								event.locals[localsSymbol].set(key, data);
-								void event.parent();
+              .then((data) => {
+                if (!event.locals[localsSymbol]) {
+                  event.locals[localsSymbol] = new Map();
+                }
+                event.locals[localsSymbol].set(key, data);
+                void event.parent();
               });
           }
         default:
@@ -303,9 +297,10 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
 /**
  * @internal
  */
-type CreateTRPCSvelteOptions<TRouter extends AnyRouter> = CreateTRPCClientOptions<TRouter> & {
-	queryClientConfig?: QueryClientConfig;
-}
+type CreateTRPCSvelteOptions<TRouter extends AnyRouter> =
+  CreateTRPCClientOptions<TRouter> & {
+    queryClientConfig?: QueryClientConfig;
+  };
 
 export function createTRPCSvelte<TRouter extends AnyRouter>(
   opts: CreateTRPCSvelteOptions<TRouter>,

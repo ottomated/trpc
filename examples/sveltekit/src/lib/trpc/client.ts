@@ -7,12 +7,12 @@ export const trpc = createTRPCSvelte<AppRouter>({
     ssrLink(httpBatchLink)({
       url: '/api/trpc',
     }),
-	],
-	queryClientConfig: {
-		defaultOptions: {
-			queries: {
-				staleTime: 1000 * 10,
-			}
-		}
-	},
+  ],
+  queryClientConfig: {
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 10,
+      },
+    },
+  },
 });

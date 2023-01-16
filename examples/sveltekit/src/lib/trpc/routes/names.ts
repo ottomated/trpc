@@ -17,7 +17,13 @@ export const nameRouter = router({
       }),
     )
     .query(async ({ input }) => {
-			await new Promise((r) => setTimeout(r, 1000));
+      await new Promise((r) => setTimeout(r, 1000));
+
+      if (!db.has(input.id)) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+        });
+      }
       return db.get(input.id);
     }),
   add: procedure

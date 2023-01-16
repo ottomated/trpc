@@ -6,10 +6,10 @@
 
 	export let data: LayoutData;
 
-	// $: trpc.loadSSRData(data.trpc);
+	const queryClient = trpc.hydrateQueryClient(data.trpc);
 
 </script>
 
-<QueryClientProvider client={trpc.queryClient}>
+<QueryClientProvider client={queryClient}>
 	<slot />
 </QueryClientProvider>
