@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { browser } from '$app/environment';
 	import { trpc } from '$lib/trpc/client';
 
 	const names = trpc.names.list.query();

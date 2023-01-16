@@ -48,7 +48,12 @@ export function parseSSRArgs(args: any[]) {
   if (args.length === 1) {
     event = args[0];
   } else if (args.length === 2) {
-    if ('locals' in args[0] && localsSymbol in args[0].locals) {
+    if (
+      args[0] &&
+      typeof args[0] === 'object' &&
+      'locals' in args[0] &&
+      localsSymbol in args[0].locals
+    ) {
       event = args[0];
       options = args[1];
     } else {

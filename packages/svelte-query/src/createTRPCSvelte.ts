@@ -35,7 +35,11 @@ import {
 } from '@trpc/server/shared';
 import { BROWSER } from 'esm-env';
 import { getArrayQueryKey } from './internals/getArrayQueryKey';
-import { DecorateProcedureUtils, callUtilMethod, DecorateRouterUtils } from './shared';
+import {
+  DecorateProcedureUtils,
+  DecorateRouterUtils,
+  callUtilMethod,
+} from './shared';
 import {
   SveltekitRequestEventInput,
   TRPCSSRData,
@@ -79,14 +83,18 @@ type DecorateProcedure<TProcedure extends AnyProcedure> =
             ssr: (
               event: SveltekitRequestEventInput,
               options?: TRPCRequestOptions,
-            ) => Promise<void>;
+            ) => Promise<
+              inferTransformedProcedureOutput<TProcedure> | undefined
+            >;
           }
         : {
             ssr: (
               input: inferProcedureInput<TProcedure>,
               event: SveltekitRequestEventInput,
               options?: TRPCRequestOptions,
-            ) => Promise<void>;
+            ) => Promise<
+              inferTransformedProcedureOutput<TProcedure> | undefined
+            >;
           }) &
         (inferProcedureInput<TProcedure> extends { cursor?: any }
           ? {
@@ -106,7 +114,9 @@ type DecorateProcedure<TProcedure extends AnyProcedure> =
                 input: inferProcedureInput<TProcedure>,
                 event: SveltekitRequestEventInput,
                 options?: TRPCRequestOptions,
-              ) => Promise<void>;
+              ) => Promise<
+                inferTransformedProcedureOutput<TProcedure> | undefined
+              >;
             }
           : object)
     : TProcedure extends AnyMutationProcedure
@@ -292,7 +302,7 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
                   event.locals[localsSymbol] = new Map();
                 }
                 event.locals[localsSymbol].set(key, data);
-                void event.parent();
+                return data;
               });
           }
         default:

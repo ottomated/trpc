@@ -18,12 +18,12 @@ import {
 } from '@tanstack/svelte-query';
 import { TRPCClientErrorLike, TRPCUntypedClient } from '@trpc/client';
 import {
+  AnyProcedure,
   AnyQueryProcedure,
   AnyRouter,
   Procedure,
   ProcedureParams,
   inferProcedureInput,
-	AnyProcedure,
 } from '@trpc/server';
 import { inferTransformedProcedureOutput } from '@trpc/server/shared';
 import { BROWSER } from 'esm-env';
@@ -35,121 +35,126 @@ import { splitUserOptions } from '../utils/splitUserOptions';
  * @internal
  */
 export type DecorateProcedureUtils<TProcedure extends AnyProcedure> =
-	TProcedure extends AnyQueryProcedure ?
-	{
-		utils: {
-			invalidate: <TPageData = unknown>(
-				input: inferProcedureInput<TProcedure>,
-				filters?: InvalidateQueryFilters<TPageData>,
-				options?: InvalidateOptions,
-			) => Promise<void>;
-			prefetch: (
-				input: inferProcedureInput<TProcedure>,
-				options?: UserExposedOptions<
-					FetchQueryOptions<
-						inferProcedureInput<TProcedure>,
-						TRPCClientErrorLike<TProcedure>
-					>
-				>,
-			) => Promise<void>;
-			fetch: (
-				input: inferProcedureInput<TProcedure>,
-				options?: UserExposedOptions<
-					FetchQueryOptions<
-						inferProcedureInput<TProcedure>,
-						TRPCClientErrorLike<TProcedure>
-					>
-				>,
-			) => Promise<inferTransformedProcedureOutput<TProcedure>>;
-			refetch: <TPageData = unknown>(
-				input: inferProcedureInput<TProcedure>,
-				filters?: RefetchQueryFilters<TPageData>,
-				options?: RefetchOptions,
-			) => Promise<void>;
-			cancel: (
-				input: inferProcedureInput<TProcedure>,
-				filters?: QueryFilters,
-				options?: CancelOptions,
-			) => Promise<void>;
-			reset: <TPageData = unknown>(
-				input: inferProcedureInput<TProcedure>,
-				filters?: ResetQueryFilters<TPageData>,
-				options?: ResetOptions,
-			) => Promise<void>;
-			setData: (
-				input: inferProcedureInput<TProcedure>,
-				updater: Updater<
-					inferTransformedProcedureOutput<TProcedure> | undefined,
-					inferTransformedProcedureOutput<TProcedure> | undefined
-				>,
-				options?: SetDataOptions,
-			) => inferTransformedProcedureOutput<TProcedure> | undefined;
-			getData: (
-				input: inferProcedureInput<TProcedure>,
-				filters?: QueryFilters,
-			) => inferTransformedProcedureOutput<TProcedure> | undefined;
-		} & (inferProcedureInput<TProcedure> extends { cursor?: any; }
-			? {
-				prefetchInfinite: (
-					input: inferProcedureInput<TProcedure>,
-					options?: UserExposedOptions<
-						FetchInfiniteQueryOptions<
-							inferProcedureInput<TProcedure>,
-							TRPCClientErrorLike<TProcedure>
-						>
-					>,
-				) => Promise<void>;
-				fetchInfinite: (
-					input: inferProcedureInput<TProcedure>,
-					options?: UserExposedOptions<
-						FetchInfiniteQueryOptions<
-							inferProcedureInput<TProcedure>,
-							TRPCClientErrorLike<TProcedure>
-						>
-					>,
-				) => Promise<InfiniteData<inferTransformedProcedureOutput<TProcedure>>>;
-				getInfiniteData(
-					input?: inferProcedureInput<TProcedure>,
-					filters?: QueryFilters,
-				): InfiniteData<inferTransformedProcedureOutput<TProcedure>> | undefined;
-				setInfiniteData(
-					input: inferProcedureInput<TProcedure>,
-					updater: Updater<
-						inferTransformedProcedureOutput<TProcedure> | undefined,
-						inferTransformedProcedureOutput<TProcedure> | undefined
-					>,
-					options?: SetDataOptions,
-				): inferTransformedProcedureOutput<TProcedure> | undefined;
-			}
-			: object);
-	} : object;
+  TProcedure extends AnyQueryProcedure
+    ? {
+        utils: {
+          invalidate: <TPageData = unknown>(
+            input: inferProcedureInput<TProcedure>,
+            filters?: InvalidateQueryFilters<TPageData>,
+            options?: InvalidateOptions,
+          ) => Promise<void>;
+          prefetch: (
+            input: inferProcedureInput<TProcedure>,
+            options?: UserExposedOptions<
+              FetchQueryOptions<
+                inferProcedureInput<TProcedure>,
+                TRPCClientErrorLike<TProcedure>
+              >
+            >,
+          ) => Promise<void>;
+          fetch: (
+            input: inferProcedureInput<TProcedure>,
+            options?: UserExposedOptions<
+              FetchQueryOptions<
+                inferProcedureInput<TProcedure>,
+                TRPCClientErrorLike<TProcedure>
+              >
+            >,
+          ) => Promise<inferTransformedProcedureOutput<TProcedure>>;
+          refetch: <TPageData = unknown>(
+            input: inferProcedureInput<TProcedure>,
+            filters?: RefetchQueryFilters<TPageData>,
+            options?: RefetchOptions,
+          ) => Promise<void>;
+          cancel: (
+            input: inferProcedureInput<TProcedure>,
+            filters?: QueryFilters,
+            options?: CancelOptions,
+          ) => Promise<void>;
+          reset: <TPageData = unknown>(
+            input: inferProcedureInput<TProcedure>,
+            filters?: ResetQueryFilters<TPageData>,
+            options?: ResetOptions,
+          ) => Promise<void>;
+          setData: (
+            input: inferProcedureInput<TProcedure>,
+            updater: Updater<
+              inferTransformedProcedureOutput<TProcedure> | undefined,
+              inferTransformedProcedureOutput<TProcedure> | undefined
+            >,
+            options?: SetDataOptions,
+          ) => inferTransformedProcedureOutput<TProcedure> | undefined;
+          getData: (
+            input: inferProcedureInput<TProcedure>,
+            filters?: QueryFilters,
+          ) => inferTransformedProcedureOutput<TProcedure> | undefined;
+        } & (inferProcedureInput<TProcedure> extends { cursor?: any }
+          ? {
+              prefetchInfinite: (
+                input: inferProcedureInput<TProcedure>,
+                options?: UserExposedOptions<
+                  FetchInfiniteQueryOptions<
+                    inferProcedureInput<TProcedure>,
+                    TRPCClientErrorLike<TProcedure>
+                  >
+                >,
+              ) => Promise<void>;
+              fetchInfinite: (
+                input: inferProcedureInput<TProcedure>,
+                options?: UserExposedOptions<
+                  FetchInfiniteQueryOptions<
+                    inferProcedureInput<TProcedure>,
+                    TRPCClientErrorLike<TProcedure>
+                  >
+                >,
+              ) => Promise<
+                InfiniteData<inferTransformedProcedureOutput<TProcedure>>
+              >;
+              getInfiniteData(
+                input?: inferProcedureInput<TProcedure>,
+                filters?: QueryFilters,
+              ):
+                | InfiniteData<inferTransformedProcedureOutput<TProcedure>>
+                | undefined;
+              setInfiniteData(
+                input: inferProcedureInput<TProcedure>,
+                updater: Updater<
+                  inferTransformedProcedureOutput<TProcedure> | undefined,
+                  inferTransformedProcedureOutput<TProcedure> | undefined
+                >,
+                options?: SetDataOptions,
+              ): inferTransformedProcedureOutput<TProcedure> | undefined;
+            }
+          : object);
+      }
+    : object;
 
 /**
  * @internal
  */
 export type DecorateRouterUtils = {
-	utils: {
-		invalidate(
-			input?: undefined,
-			filters?: InvalidateQueryFilters,
-			options?: InvalidateOptions,
-		): Promise<void>;
-		refetch: <TPageData = unknown>(
-			input?: undefined,
-			filters?: RefetchQueryFilters<TPageData>,
-			options?: RefetchOptions,
-		) => Promise<void>;
-		cancel: (
-			input?: undefined,
-			filters?: QueryFilters,
-			options?: CancelOptions,
-		) => Promise<void>;
-		reset: <TPageData = unknown>(
-			input?: undefined,
-			filters?: ResetQueryFilters<TPageData>,
-			options?: ResetOptions,
-		) => Promise<void>;
-	}
+  utils: {
+    invalidate(
+      input?: undefined,
+      filters?: InvalidateQueryFilters,
+      options?: InvalidateOptions,
+    ): Promise<void>;
+    refetch: <TPageData = unknown>(
+      input?: undefined,
+      filters?: RefetchQueryFilters<TPageData>,
+      options?: RefetchOptions,
+    ) => Promise<void>;
+    cancel: (
+      input?: undefined,
+      filters?: QueryFilters,
+      options?: CancelOptions,
+    ) => Promise<void>;
+    reset: <TPageData = unknown>(
+      input?: undefined,
+      filters?: ResetQueryFilters<TPageData>,
+      options?: ResetOptions,
+    ) => Promise<void>;
+  };
 };
 
 type ContextMethod = keyof DecorateProcedureUtils<
@@ -179,7 +184,7 @@ export function callUtilMethod<TRouter extends AnyRouter>(
   args: any[],
 ): unknown {
   // If we're not in the browser, we need to use the queryClient from the context,
-	// which will fail unless called during component initialization
+  // which will fail unless called during component initialization
   if (!BROWSER) {
     // This isn't a hook
     // eslint-disable-next-line react-hooks/rules-of-hooks
