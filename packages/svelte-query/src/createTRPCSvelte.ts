@@ -35,7 +35,7 @@ import {
 } from '@trpc/server/shared';
 import { BROWSER } from 'esm-env';
 import { getArrayQueryKey } from './internals/getArrayQueryKey';
-import { CreateSvelteUtilsProxy, createUtilsProxy } from './shared';
+import { DecorateProcedureUtils, callUtilMethod, DecorateRouterUtils } from './shared';
 import {
   SveltekitRequestEventInput,
   TRPCSSRData,
@@ -133,15 +133,15 @@ type DecoratedProcedureRecord<TProcedures extends ProcedureRouterRecord> = {
   [TKey in keyof TProcedures]: TProcedures[TKey] extends AnyRouter
     ? DecoratedProcedureRecord<TProcedures[TKey]['_def']['record']>
     : TProcedures[TKey] extends AnyProcedure
-    ? DecorateProcedure<TProcedures[TKey]>
+    ? DecorateProcedure<TProcedures[TKey]> &
+        DecorateProcedureUtils<TProcedures[TKey]>
     : never;
-};
+} & DecorateRouterUtils;
 
 /**
  * @internal
  */
-export type CreateTRPCSvelteBase<TRouter extends AnyRouter> = {
-  context: CreateSvelteUtilsProxy<TRouter>;
+export type CreateTRPCSvelteBase<_TRouter extends AnyRouter> = {
   queryClient: QueryClient;
   ssr: typeof getSSRData;
   hydrateQueryClient: (data: TRPCSSRData) => QueryClient;
@@ -173,8 +173,6 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
 
   return createFlatProxy<CreateTRPCSvelte<TRouter>>((firstPath) => {
     switch (firstPath) {
-      case 'context':
-        return createUtilsProxy(client, queryClient);
       case 'queryClient': {
         if (BROWSER) {
           return queryClient;
@@ -209,13 +207,23 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
       const method = path.pop()! as ClientMethod;
       const joinedPath = path.join('.');
 
-      const args = unknownArgs as any[];
-
       // Pull the query options out of the args - it's at a different index based on the method
       const methodData = clientMethods[method];
       if (!methodData) {
-        throw new TypeError(`trpc.${path}.${method} is not a function`);
+        const utils = path.pop();
+        if (utils === 'utils') {
+          return callUtilMethod(
+            client,
+            queryClient,
+            path,
+            method as any,
+            unknownArgs,
+          );
+        }
+        throw new TypeError(`trpc.${joinedPath}.${method} is not a function`);
       }
+      const args = unknownArgs as any[];
+
       const [optionIndex, queryType] = methodData;
       const options = args[optionIndex] as UserExposedOptions<any> | undefined;
       const [trpcOptions, tanstackQueryOptions] = splitUserOptions(options);
@@ -263,7 +271,7 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
         case 'ssrInfinite':
           if (BROWSER) {
             throw new TypeError(
-              `\`trpc.${path}.ssr\` is only available on the server`,
+              `\`trpc.${joinedPath}.ssr\` is only available on the server`,
             );
           } else {
             const [input, event, options] = parseSSRArgs(args);
@@ -288,7 +296,7 @@ function createSvelteInternalProxy<TRouter extends AnyRouter>(
               });
           }
         default:
-          throw new TypeError(`trpc.${path}.${method} is not a function`);
+          throw new TypeError(`trpc.${joinedPath}.${method} is not a function`);
       }
     });
   });

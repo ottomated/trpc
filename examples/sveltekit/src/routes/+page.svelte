@@ -2,16 +2,13 @@
   import { browser } from '$app/environment';
 	import { trpc } from '$lib/trpc/client';
 
-	const utils = trpc.context;
-
 	const names = trpc.names.list.query();
-	
 
 	let newName = '';
 
 	const invalidator = {
 		onSuccess: () => {
-			utils.names.list.invalidate();
+			trpc.names.list.utils.invalidate();
 		},
 	};
 	const addName = trpc.names.add.mutation(invalidator);
